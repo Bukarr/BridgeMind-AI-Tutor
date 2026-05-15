@@ -1,0 +1,8 @@
+{
+  "name": "BridgeMind",
+  "description": "AI-powered learning for every African student — regardless of language, curriculum, or connectivity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

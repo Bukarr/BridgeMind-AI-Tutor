@@ -1,0 +1,17 @@
+{
+  "name": "BridgeMind",
+  "short_name": "BridgeMind",
+  "description": "AI-powered learning for every African student.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#02040a",
+  "theme_color": "#080c18",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/isometric/512/brain.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

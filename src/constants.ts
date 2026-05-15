@@ -1,0 +1,16 @@
+export const SUBJECTS = [
+  { name: 'Mathematics', icon: '📐', id: 'mathematics', color: 'cyan' },
+  { name: 'English Language', icon: '📚', id: 'english', color: 'blue' },
+  { name: 'Biology', icon: '🧬', id: 'biology', color: 'emerald' },
+  { name: 'Chemistry', icon: '🧪', id: 'chemistry', color: 'purple' },
+  { name: 'Physics', icon: '⚛️', id: 'physics', color: 'indigo' },
+  { name: 'Economics', icon: '💼', id: 'economics', color: 'amber' },
+  { name: 'Government', icon: '🏛️', id: 'government', color: 'rose' },
+  { name: 'Commerce', icon: '⚖️', id: 'commerce', color: 'orange' },
+  { name: 'Marketing', icon: '📈', id: 'marketing', color: 'cyan' },
+  { name: 'Financial Accounting', icon: '📊', id: 'accounting', color: 'slate' },
+  { name: 'Literature-in-English', icon: '📖', id: 'literature', color: 'amber' },
+  { name: 'Agricultural Sci', icon: '🌾', id: 'agri', color: 'green' },
+  { name: 'ICT', icon: '💻', id: 'ict', color: 'blue' },
+  { name: 'Social Studies', icon: '🌍', id: 'social_studies', color: 'orange' },
+];

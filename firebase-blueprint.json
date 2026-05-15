@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores learner's preferences and progress",
+      "type": "object",
+      "properties": {
+        "language": { "type": "string" },
+        "languageCode": { "type": "string" },
+        "curriculum": { "type": "string" },
+        "curriculumRegion": { "type": "string" },
+        "region": { "type": "string" },
+        "country": { "type": "string" },
+        "comprehensionLevel": { "type": "number", "description": "Comprehension level from 1 (basic) to 10 (advanced)" },
+        "learningStyle": { "type": "string", "description": "Analyzing preferred learning style based on interaction" },
+        "complexityPreference": { "type": "string", "enum": ["simple", "standard", "complex"] },
+        "vocabularyRange": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Session": {
+      "title": "Study Session",
+      "description": "A single tutoring conversation",
+      "type": "object",
+      "properties": {
+        "topic": { "type": "string" },
+        "subject": { "type": "string" },
+        "curriculum": { "type": "string" },
+        "language": { "type": "string" },
+        "messages": { "type": "array" },
+        "timestamp": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Main user collection"
+    },
+    "users/{userId}/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "User study sessions"
+    }
+  }
+}
