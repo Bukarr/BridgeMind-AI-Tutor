@@ -9,6 +9,14 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+let isShuttingDown = false;
+
+// Reject new requests when shutting down
+app.use((req, res, next) => {
+  if (isShuttingDown) return res.status(503).json({ error: 'Server is shutting down' });
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -344,6 +352,16 @@ app.post("/api/analyze-learner", async (req, res) => {
   }
 });
 
+// Health and readiness endpoints for load balancers and orchestrators
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+app.get('/ready', (_req, res) => {
+  if (isShuttingDown) return res.status(503).json({ ready: false });
+  res.status(200).json({ ready: true });
+});
+
 function buildTutorSystemPrompt(learner: any, subject?: string, lowBandwidth?: boolean) {
   const level = learner.comprehensionLevel || 5;
   const complexity = learner.complexityPreference || 'standard';
@@ -447,9 +465,28 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+
+  // Graceful shutdown
+  function shutdown() {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log('Received shutdown signal — closing server...');
+    server.close(() => {
+      console.log('Server closed. Exiting.');
+      process.exit(0);
+    });
+    // Force exit if shutdown takes too long
+    setTimeout(() => {
+      console.error('Forcing shutdown after timeout.');
+      process.exit(1);
+    }, 30000);
+  }
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 }
 
 startServer();
