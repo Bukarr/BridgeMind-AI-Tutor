@@ -28,9 +28,9 @@ jobs:
           push: true
           tags: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
 
-      - name: Deploy to Cloud Run
+      - name: Deploy to Cloud Run (use Secret Manager for GEMINI_API_KEY)
         run: |
           gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
             --image gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }} \
             --region ${{ secrets.GCP_REGION }} --platform managed --allow-unauthenticated \
-            --set-env-vars GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest
