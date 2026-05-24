@@ -21,6 +21,11 @@ const ai = new GoogleGenAI({
   }
 });
 
+const AI_ENABLED = Boolean(process.env.GEMINI_API_KEY);
+if (!AI_ENABLED) {
+  console.warn('Gemini API key not found. AI endpoints will return 503 until GEMINI_API_KEY is configured.');
+}
+
 // Using modern model aliases from gemini-api skill
 const PRIMARY_MODEL = "gemini-3-flash-preview";
 const FALLBACK_MODEL = "gemini-flash-latest";
@@ -69,6 +74,9 @@ const SUPPORTED_MIME_TYPES = [
 
 // API Routes
 app.post("/api/tutor", async (req, res) => {
+  if (!AI_ENABLED) {
+    return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY to enable tutor features.' });
+  }
   const { messages, learnerProfile, subject, lowBandwidth } = req.body;
   
   const generateWithModel = async (modelName: string, attempt = 0) => {
@@ -169,6 +177,9 @@ app.post("/api/tutor", async (req, res) => {
 });
 
 app.post("/api/explain", async (req, res) => {
+  if (!AI_ENABLED) {
+    return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY to enable explain features.' });
+  }
   const { topic, subject, learnerProfile } = req.body;
   
   const complexity = learnerProfile.complexityPreference || 'standard';
@@ -213,6 +224,9 @@ app.post("/api/explain", async (req, res) => {
 });
 
 app.post("/api/practice", async (req, res) => {
+  if (!AI_ENABLED) {
+    return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY to enable practice features.' });
+  }
   const { topic, subject, learnerProfile } = req.body;
   
   try {
@@ -240,6 +254,9 @@ app.post("/api/practice", async (req, res) => {
 });
 
 app.post("/api/explore", async (req, res) => {
+  if (!AI_ENABLED) {
+    return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY to enable explore features.' });
+  }
   const { subject, learnerProfile } = req.body;
 
   try {
@@ -263,6 +280,12 @@ app.post("/api/explore", async (req, res) => {
 });
 
 app.post("/api/greeting", async (req, res) => {
+  if (!AI_ENABLED) {
+    // Provide a harmless fallback greeting so the home UI still shows content when AI is disabled
+    const { learnerProfile } = req.body;
+    const fallback = `Welcome back${learnerProfile?.name ? ', ' + learnerProfile.name : ''}! Ready to continue your studies?`;
+    return res.json({ greeting: fallback });
+  }
   const { learnerProfile, lastTopic, hour } = req.body;
   
   try {
@@ -282,6 +305,9 @@ app.post("/api/greeting", async (req, res) => {
 });
 
 app.post("/api/analyze-learner", async (req, res) => {
+  if (!AI_ENABLED) {
+    return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY to enable analysis features.' });
+  }
   const { messages } = req.body;
   
   try {
