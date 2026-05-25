@@ -39,62 +39,15 @@ export default function Practice() {
   const learnTopic = async () => {
     if (!topic.trim()) return;
     setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/explain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, subject, learnerProfile: profile })
-      });
-      
-      if (!res.ok) {
-        throw new Error('Failed to generate academic explanation.');
-      }
-      
-      const data = await res.json();
-      setExplanation(data.explanation);
-      setShowExplanation(true);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    setError('Practice features are currently disabled. Use the Tutor chat for AI support.');
+    setIsLoading(false);
   };
 
   const startPractice = async () => {
     if (!topic.trim()) return;
     setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/practice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, subject, learnerProfile: profile })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error (Status ${res.status}). Please try again.`);
-      }
-      
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        console.error("Invalid JSON response:", text);
-        throw new Error('Received invalid response from server. Please try again.');
-      }
-      setQuestions(data.questions || []);
-      setCurrentIndex(0);
-      setScore(0);
-      setIsFinished(false);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    setError('Practice features are currently disabled. Use the Tutor chat for AI support.');
+    setIsLoading(false);
   };
 
   const handleAnswer = (option: string) => {

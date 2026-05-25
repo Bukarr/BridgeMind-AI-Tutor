@@ -28,23 +28,9 @@ export default function Home() {
       if (cached) {
         setGreeting(cached.greeting);
       } else {
-        setGreeting(''); // Clear previous language greeting
-        const res = await fetch('/api/greeting', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            learnerProfile: profile,
-            hour: new Date().getHours()
-          })
-        });
-        
-        if (!res.ok) {
-           throw new Error('Greeting API failed');
-        }
-
-        const data = await res.json().catch(() => ({ greeting: "Welcome back! Ready to continue your studies?" }));
-        setGreeting(data.greeting);
-        await db.put('daily_cache', { date: cacheKey, greeting: data.greeting, focusTopic: null });
+        const fallback = `Welcome back${profile?.name ? ', ' + profile.name : ''}! Ready to continue your studies?`;
+        setGreeting(fallback);
+        await db.put('daily_cache', { date: cacheKey, greeting: fallback, focusTopic: null });
       }
 
       const allSessions = await db.getAllFromIndex('sessions', 'by-updated');

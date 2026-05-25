@@ -6,10 +6,18 @@ BridgeMind is an AI-powered learning equalizer designed for African students. It
 
 - **Personalized AI Tutor**: Chat with an AI that understands your local curriculum and context.
 
-Deployment
-----------
-See [DEPLOY.md](DEPLOY.md) for production deployment instructions using Cloud Run, Firebase Hosting rewrites, Secret Manager, and CI/CD with GitHub Actions.
 - **Adaptive Practice**: Generate challenges based on specific topics and subjects.
+
+## Local development
+
+This app uses an Express backend for `/api/tutor` routing. Run locally with:
+
+```bash
+npm install
+npm run dev
+```
+
+The backend serves the tutor API and the frontend is served by Vite in development.
 - **Knowledge HUB**: Explore a wide range of subjects including Mathematics, English, Sciences (Biology, Chemistry, Physics), and Social Sciences.
 - **Offline First**: Built with Progressive Web App (PWA) technology for seamless access even without a stable internet connection.
 - **Multilingual Support**: Learn in your preferred language (Hausa, Swahili, English, etc.).

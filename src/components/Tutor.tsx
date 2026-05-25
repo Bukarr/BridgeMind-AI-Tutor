@@ -211,25 +211,6 @@ export default function Tutor() {
         updatedAt: Date.now()
       });
 
-      // Periodic AI-powered analysis of user comprehension
-      const userMessageCount = [...tutorMessages, { ...assistantMessage, content: assistantContent }].filter(m => m.role === 'user').length;
-      if (userMessageCount > 0 && userMessageCount % 3 === 0) {
-        try {
-          const analysisResponse = await fetch('/api/analyze-learner', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: [...tutorMessages, assistantMessage] })
-          });
-          if (analysisResponse.ok) {
-            const analysis = await analysisResponse.json();
-            useLearnerStore.getState().updateProfile(analysis);
-            console.log('Learner Profile Adaptive Update:', analysis);
-          }
-        } catch (analErr) {
-          console.warn('Silent failure in learner analysis:', analErr);
-        }
-      }
-
     } catch (error: any) {
       console.error('Tutor Error:', error);
       setMessages(prev => [...prev, {
