@@ -30,6 +30,31 @@ npm run start:express
 Notes:
 - `npm run dev` uses `server.ts` via `tsx` for a TypeScript dev server (hot reload).
 - `npm run start:express` runs the standalone `express-backend.cjs` (useful for simple local testing).
+
+Auth (Google Sign-In)
+----------------------
+This backend verifies Google ID tokens issued by the Google Identity Services on the frontend.
+
+1. Create a Google OAuth Client ID in Google Cloud Console and set it in your environment:
+
+```bash
+export GOOGLE_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+```
+
+2. On the frontend, obtain an `id_token` using Google Identity Services (GSI) and send it to the backend as an Authorization header:
+
+```
+Authorization: Bearer <ID_TOKEN>
+```
+
+3. The backend exposes `POST /auth/verify` to validate an `id_token` (in body `id_token` or Authorization header) and `POST /api/tutor` is now protected — include the `Authorization` header with the ID token when calling the tutor API.
+
+Example curl to verify token:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"id_token":"<ID_TOKEN>"}' http://localhost:3000/auth/verify
+```
+
 - **Knowledge HUB**: Explore a wide range of subjects including Mathematics, English, Sciences (Biology, Chemistry, Physics), and Social Sciences.
 - **Offline First**: Built with Progressive Web App (PWA) technology for seamless access even without a stable internet connection.
 - **Multilingual Support**: Learn in your preferred language (Hausa, Swahili, English, etc.).

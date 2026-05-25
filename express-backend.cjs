@@ -15,6 +15,36 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const AI_ENABLED = Boolean(process.env.GEMINI_API_KEY);
 if (!AI_ENABLED) console.warn('GEMINI_API_KEY not set — /api/tutor will return 503 until configured.');
 
+// Google OAuth2 token verification
+const { OAuth2Client } = require('google-auth-library');
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+if (!GOOGLE_CLIENT_ID) console.warn('GOOGLE_CLIENT_ID not set — Google auth will not validate tokens.');
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+async function verifyGoogleIdToken(idToken) {
+  const ticket = await googleClient.verifyIdToken({ idToken, audience: GOOGLE_CLIENT_ID });
+  const payload = ticket.getPayload();
+  return payload;
+}
+
+async function requireAuth(req, res, next) {
+  try {
+    const auth = req.headers.authorization || '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+    if (!token) return res.status(401).json({ error: 'Missing Authorization header with Bearer token.' });
+    if (!GOOGLE_CLIENT_ID) return res.status(500).json({ error: 'Server misconfigured: GOOGLE_CLIENT_ID missing.' });
+    const payload = await verifyGoogleIdToken(token);
+    if (!payload || !payload.email) return res.status(401).json({ error: 'Invalid Google ID token.' });
+    // Optionally restrict to Gmail addresses only
+    // if (!payload.email.endsWith('@gmail.com')) return res.status(403).json({ error: 'Gmail account required.' });
+    req.user = { id: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
+    next();
+  } catch (err) {
+    console.warn('Auth verification failed:', err && err.message ? err.message : err);
+    return res.status(401).json({ error: 'Invalid or expired Google ID token.' });
+  }
+}
+
 const PRIMARY_MODEL = 'gemini-3-flash-preview';
 const FALLBACK_MODEL = 'gemini-flash-latest';
 const EMERGENCY_MODEL = 'gemini-3.1-flash-lite';
@@ -49,7 +79,7 @@ function buildTutorSystemPrompt(learner, subject, lowBandwidth) {
   return `You are BridgeMind — an AI academic tutor.\n- Language: ${learner && learner.language || 'English'}\n- Curriculum: ${learner && learner.curriculum || 'General'}\n- Subject: ${subject || 'General'}\n- Learner Level: ${level}/10\n- Learning Style: ${style}\n- ${complexityInstruction}\n- Bandwidth: ${lowBandwidth ? 'low' : 'standard'}`;
 }
 
-app.post('/api/tutor', async (req, res) => {
+app.post('/api/tutor', requireAuth, async (req, res) => {
   if (!AI_ENABLED) return res.status(503).json({ error: 'AI not configured. Set GEMINI_API_KEY.' });
   const { messages, learnerProfile, subject, lowBandwidth } = req.body;
   const chatMessages = Array.isArray(messages) ? messages : [];
@@ -71,6 +101,20 @@ app.post('/api/tutor', async (req, res) => {
   } catch (err) {
     console.error('Tutor API Error:', err);
     if (!res.headersSent) res.status(500).json({ error: 'Failed to generate tutor response.' });
+  }
+});
+
+// Auth verify endpoint - accepts id_token in body or Authorization header
+app.post('/auth/verify', async (req, res) => {
+  try {
+    const idToken = req.body.id_token || (req.headers.authorization && req.headers.authorization.startsWith('Bearer ') ? req.headers.authorization.slice(7) : null);
+    if (!idToken) return res.status(400).json({ error: 'id_token required in body or Authorization header' });
+    if (!GOOGLE_CLIENT_ID) return res.status(500).json({ error: 'Server misconfigured: GOOGLE_CLIENT_ID missing.' });
+    const payload = await verifyGoogleIdToken(idToken);
+    return res.json({ user: { id: payload.sub, email: payload.email, name: payload.name, picture: payload.picture } });
+  } catch (err) {
+    console.warn('Auth verify failed:', err && err.message ? err.message : err);
+    return res.status(401).json({ error: 'Invalid id_token' });
   }
 });
 
