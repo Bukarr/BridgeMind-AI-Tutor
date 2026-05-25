@@ -28,7 +28,7 @@ export default function Home() {
       if (cached) {
         setGreeting(cached.greeting);
       } else {
-        const fallback = `Welcome back${profile?.name ? ', ' + profile.name : ''}! Ready to continue your studies?`;
+        const fallback = 'Welcome back! Ready to continue your studies?';
         setGreeting(fallback);
         await db.put('daily_cache', { date: cacheKey, greeting: fallback, focusTopic: null });
       }
