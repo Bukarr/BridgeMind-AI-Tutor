@@ -18,6 +18,18 @@ npm run dev
 ```
 
 The backend serves the tutor API and the frontend is served by Vite in development.
+
+To run the simplified Express backend directly (CommonJS):
+
+```bash
+# Ensure GEMINI_API_KEY is set in your environment or in a .env file
+export GEMINI_API_KEY="your_key_here"
+npm run start:express
+```
+
+Notes:
+- `npm run dev` uses `server.ts` via `tsx` for a TypeScript dev server (hot reload).
+- `npm run start:express` runs the standalone `express-backend.cjs` (useful for simple local testing).
 - **Knowledge HUB**: Explore a wide range of subjects including Mathematics, English, Sciences (Biology, Chemistry, Physics), and Social Sciences.
 - **Offline First**: Built with Progressive Web App (PWA) technology for seamless access even without a stable internet connection.
 - **Multilingual Support**: Learn in your preferred language (Hausa, Swahili, English, etc.).
